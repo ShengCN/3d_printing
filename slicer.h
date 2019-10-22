@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include "geometry_ds.h"
 
 /************************************************************************/
@@ -14,6 +15,8 @@ public:
 					  std::vector<line_segment> &out_path) = 0;
 };
 
+typedef std::vector <std::shared_ptr<line_segment>> layer_paths;
+
 // what slicer should do:
 // 1. input a triangle mesh and a plane(vec3 p, vec3 n), compute intersection
 // 2. generate slicing layer (should just be a line loop?)
@@ -25,5 +28,5 @@ class slicer {
 public:
 	slicer() = default;
 
-	//------- Interface --------//
+	static bool write_layers(std::vector<layer_paths> all_layers, const std::string output_file);
 };
