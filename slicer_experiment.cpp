@@ -1,6 +1,4 @@
 #include "slicer_experiment.h"
-#include "qogl_vis_slicer.h"
-
 
 slicer_experiment::slicer_experiment() {
 }
