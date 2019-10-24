@@ -14,7 +14,8 @@ std::vector<std::vector<std::shared_ptr<line_segment>>> slicer_experiment::exp_s
 	float radius = 10.0f;
 	int tessellation_min = 4, tessellation_max = 104;
 	int tessellation_step = 10;
-	
+	int grid_num = 4;
+
 	auto scale_factor = [](float radius, int tessellation_num) {
 		float perimeter = 2.0 * pd::pi * radius;
 		pd::deg delta_angle = 360 / tessellation_num;
@@ -47,7 +48,17 @@ std::vector<std::vector<std::shared_ptr<line_segment>>> slicer_experiment::exp_s
 			lst_vec = cur_vec;
 		}
 
-		ret.push_back(boundaries);
+		std::vector<std::shared_ptr<line_segment>> grid_boundries;
+		// copy paste to a gird 
+		float offset = 2.5 * radius;
+		for (int xi = 0; xi < grid_num; ++xi) for (int yi = 0; yi < grid_num; ++yi) {
+			vec3 offset_vector = vec3(offset * xi, 0.0f, offset * yi);
+			for(auto b:boundaries) {
+				grid_boundries.push_back(std::make_shared<line_segment>(b->t + offset_vector, b->h + offset_vector));
+			}
+		}
+
+		ret.push_back(grid_boundries);
 	}
 
 	return ret;
