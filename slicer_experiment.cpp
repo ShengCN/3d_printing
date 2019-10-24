@@ -2,6 +2,7 @@
 #include "geometry_ds.h"
 #include "graphics_lib/common.h"
 
+
 slicer_experiment::slicer_experiment() {
 }
 
@@ -10,7 +11,7 @@ slicer_experiment::~slicer_experiment() {
 }
 
 /* Test line segments speed */
-std::vector<std::vector<std::shared_ptr<line_segment>>> slicer_experiment::exp_speed_test() {
+std::vector<layer_paths> slicer_experiment::exp_speed_test() {
 	float radius = 10.0f;
 	int tessellation_min = 4, tessellation_max = 104;
 	int tessellation_step = 10;
@@ -29,7 +30,7 @@ std::vector<std::vector<std::shared_ptr<line_segment>>> slicer_experiment::exp_s
 		return delta_arc / delta_length;
 	};
 
-	std::vector<std::vector<std::shared_ptr<line_segment>>> ret;
+	std::vector<layer_paths> ret;
 	for(int tes_num = tessellation_min; tes_num <= tessellation_max; tes_num += tessellation_step) {
 		std::vector<std::shared_ptr<line_segment>> boundaries;
 
@@ -48,17 +49,19 @@ std::vector<std::vector<std::shared_ptr<line_segment>>> slicer_experiment::exp_s
 			lst_vec = cur_vec;
 		}
 
-		std::vector<std::shared_ptr<line_segment>> grid_boundries;
+		layer_paths cur_layer;
 		// copy paste to a gird 
 		float offset = 2.5 * radius;
 		for (int xi = 0; xi < grid_num; ++xi) for (int yi = 0; yi < grid_num; ++yi) {
+			closed_poly cur_poly;
 			vec3 offset_vector = vec3(offset * xi, 0.0f, offset * yi);
 			for(auto b:boundaries) {
-				grid_boundries.push_back(std::make_shared<line_segment>(b->t + offset_vector, b->h + offset_vector));
+				cur_poly.push_back(std::make_shared<line_segment>(b->t + offset_vector, b->h + offset_vector));
 			}
+			cur_layer.push_back(cur_poly);
 		}
 
-		ret.push_back(grid_boundries);
+		ret.push_back(cur_layer);
 	}
 
 	return ret;

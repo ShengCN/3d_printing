@@ -12,10 +12,15 @@ bool slicer::write_layers(std::vector<layer_paths> all_layers, const std::string
 			continue;
 		}
 		oss << "layer " << layer_counter++ << std::endl;
-		for(auto &line_seg:l) {
-			oss << line_seg->t.x << " " << line_seg->t.z << " ";
+		/* Some closed polygons */
+		for(auto &poly:l) {
+			/* For each closed polygon */
+			for (auto &line_seg : poly) {
+				oss << line_seg->t.x << " " << line_seg->t.z << " ";
+			}
+			oss << poly[0]->t.x << " " << poly[0]->t.z << " b ";
 		}
-		oss << l[0]->t.x << " " << l[0]->t.z << std::endl;
+		oss << std::endl;
 	}
 
 	bool success = false;

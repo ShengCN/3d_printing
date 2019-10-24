@@ -3,6 +3,9 @@
 #include <string>
 #include "geometry_ds.h"
 
+typedef std::vector<std::shared_ptr<line_segment>> closed_poly;
+typedef std::vector<closed_poly> layer_paths;
+
 /************************************************************************/
 /* Base Class for Infill Path                                           */
 /************************************************************************/
@@ -14,8 +17,6 @@ public:
 	virtual void compute_path(std::vector<line_segment> boundary_loop,
 					  std::vector<line_segment> &out_path) = 0;
 };
-
-typedef std::vector <std::shared_ptr<line_segment>> layer_paths;
 
 // what slicer should do:
 // 1. input a triangle mesh and a plane(vec3 p, vec3 n), compute intersection
