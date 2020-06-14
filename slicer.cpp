@@ -30,7 +30,7 @@ bool slicer::write_layers(std::vector<layer_paths> all_layers, const std::string
 		success = true;
 		INFO("File " + output_file + " saved");
 	} else {
-		LOG_FAIL("File " + output_file + " save");
+		WARN("File " + output_file + " save");
 	}
 	ofile.close();
 

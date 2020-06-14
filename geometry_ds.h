@@ -17,8 +17,8 @@ struct line_segment{
 
 	std::string to_string() {
 		std::ostringstream oss;
-		oss << "tail: " << vec3_2_string(t);
-		oss << " head: " << vec3_2_string(h);
+		oss << "tail: " << purdue::to_string(t);
+		oss << " head: " << purdue::to_string(h);
 		return oss.str();
 	}
 };
@@ -30,7 +30,7 @@ struct plane {
 };
 
 inline bool same_line_segment(std::shared_ptr<line_segment> a, std::shared_ptr<line_segment> b) {
-	return same_point(a->t, b->t) && same_point(a->h, b->h);
+	return purdue::same_point(a->t, b->t) && purdue::same_point(a->h, b->h);
 }
 
 inline bool left_turn(vec3 &a, vec3 &b, vec3 &c) {

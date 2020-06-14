@@ -3,6 +3,8 @@
 #include "graphics_lib/common.h"
 #include "graphics_lib/Render/mesh.h"
 
+using namespace purdue;
+
 slicer_experiment::slicer_experiment() {
 }
 

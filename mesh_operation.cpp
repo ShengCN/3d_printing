@@ -43,7 +43,7 @@ bool mesh_opt::line_segment_plane_intersection(std::shared_ptr<line_segment> ls,
 tp_intersection_type mesh_opt::triangle_plane_intersect(std::shared_ptr<triangle> t, std::shared_ptr<plane> p,
 											  std::shared_ptr<line_segment> intersections, std::vector<vec3>& bary_centric) {
 	if(!t || !p || !intersections) {
-		LOG_FAIL("shared_ptr input");
+		WARN("shared_ptr input");
 		return tp_intersection_type::unknown;
 	}
 	
@@ -167,7 +167,7 @@ bool mesh_opt::slice_mesh(std::shared_ptr<mesh> m,
 	segments.clear();
 
 	if(!m || !p || !upper || !bottom) {
-		LOG_FAIL("input of slice mesh");
+		WARN("input of slice mesh");
 		return false;
 	}
 
@@ -319,7 +319,7 @@ bool mesh_opt::slice_mesh(std::shared_ptr<mesh> m, std::shared_ptr<plane> p, std
 	segments.clear();
 
 	if (!m || !p) {
-		LOG_FAIL("input of slice mesh");
+		WARN("input of slice mesh");
 		return false;
 	}
 
@@ -347,7 +347,7 @@ bool mesh_opt::slice_mesh(std::shared_ptr<mesh> m, std::shared_ptr<plane> p, std
 
 void mesh_opt::merge_mesh(std::vector<std::shared_ptr<mesh>> meshes, std::shared_ptr<mesh> out) {
 	if(!out) {
-		LOG_FAIL("input of merge mesh");
+		WARN("input of merge mesh");
 		assert(false);
 	}
 	for(auto &m:meshes) {
