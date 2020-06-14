@@ -2,9 +2,9 @@
 #include "geometry_ds.h"
 #include "graphics_lib/common.h"
 #include "graphics_lib/Render/mesh.h"
+#include <glm/gtx/transform.hpp>
 
 using namespace purdue;
-
 slicer_experiment::slicer_experiment() {
 }
 
@@ -18,8 +18,8 @@ std::vector<layer_paths> slicer_experiment::exp_speed_test(pd::deg turning_alpha
 
 	vec3 speed_vector(0.0f, 0.0f, -1.0f), axis(0.0f);
 
-	glm::mat4 left_rot = glm::rotate(deg2rad(turning_alpha), glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 right_rot = glm::rotate(-deg2rad(turning_alpha), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 left_rot = glm::rotate(pd::deg2rad(turning_alpha), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 right_rot = glm::rotate(-pd::deg2rad(turning_alpha), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	//------- Construct One Column Results --------//
 	auto building_block = [](glm::mat4 left_rot, glm::mat4 right_rot, int seg_num, vec3 speed_vector) {
@@ -55,7 +55,7 @@ std::vector<layer_paths> slicer_experiment::exp_speed_test(pd::deg turning_alpha
 		assert(false);
 	}
 
-	 mat4 col_rot_mat = glm::rotate(deg2rad(180.0), col_rot_axis);
+	 mat4 col_rot_mat = glm::rotate(pd::deg2rad(180.0), col_rot_axis);
 	// rotate the first building block 
 	closed_poly col_double_result = col_result;
 	for(auto s: col_result) {

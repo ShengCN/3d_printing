@@ -10,6 +10,7 @@
 
 using glm::dot;
 using namespace mesh_opt;
+using namespace purdue;
 
 AABB mesh_opt::compute_world_aabb(std::vector<std::shared_ptr<mesh>> meshes) {
 	if (meshes.empty())
@@ -89,8 +90,8 @@ tp_intersection_type mesh_opt::triangle_plane_intersect(std::shared_ptr<triangle
 	}
 
 	// std::cerr << p1_t << " " << p2_t << std::endl;
-	intersections->t = lerp(same_side_p1, other_p, p1_t);
-	intersections->h = lerp(same_side_p2, other_p, p2_t);
+	intersections->t = pd::lerp(same_side_p1, other_p, p1_t);
+	intersections->h = pd::lerp(same_side_p2, other_p, p2_t);
 	
 	// clamp to deal with end points
 	t_bary = vec3(t_bary.x, t_bary.y, t_bary.z);
@@ -121,10 +122,10 @@ bool loop_line_segments(const std::vector<std::shared_ptr<line_segment>> &unsort
 		un_sorted_set.erase(cur_seg);
 		sorted_queue.push_back(cur_seg);
 
-		while (!same_point(cur_seg->h, first_seg->t)) {
+		while (!pd::same_point(cur_seg->h, first_seg->t)) {
 			bool is_found = false;
 			for (auto &ls : un_sorted_set) {
-				if (same_point(cur_seg->h, ls->t)) {
+				if (pd::same_point(cur_seg->h, ls->t)) {
 					cur_seg = ls;
 					un_sorted_set.erase(ls);
 					sorted_queue.push_back(cur_seg);
@@ -133,7 +134,7 @@ bool loop_line_segments(const std::vector<std::shared_ptr<line_segment>> &unsort
 					break;
 				}
 
-				if (same_point(cur_seg->h, ls->h)) {
+				if (pd::same_point(cur_seg->h, ls->h)) {
 					cur_seg = std::make_shared<line_segment>(ls->h, ls->t);
 					un_sorted_set.erase(ls);
 					sorted_queue.push_back(cur_seg);
@@ -350,7 +351,9 @@ void mesh_opt::merge_mesh(std::vector<std::shared_ptr<mesh>> meshes, std::shared
 		WARN("input of merge mesh");
 		assert(false);
 	}
-	for(auto &m:meshes) {
-		out->merge_mesh(m);
-	}
+
+	//#todo_merge_mesh
+	//for(auto &m:meshes) {
+	//	out->merge_mesh(m);
+	//}
 }
