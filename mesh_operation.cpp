@@ -150,7 +150,8 @@ bool loop_line_segments(const std::vector<std::shared_ptr<line_segment>> &unsort
 				for (auto &s : un_sorted_set) {
 					INFO(s->to_string());
 				}
-				assert(false);
+                return false;
+				// assert(false);
 				break;
 			}
 		}
