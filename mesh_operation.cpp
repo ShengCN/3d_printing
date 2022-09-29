@@ -165,7 +165,7 @@ bool mesh_opt::slice_mesh(std::shared_ptr<mesh> m,
 				std::vector<std::shared_ptr<line_segment>>& segments, 
 				std::shared_ptr<mesh> upper, 
 				std::shared_ptr<mesh> bottom) {
-	bool is_intersect = false;
+    bool is_intersect = false;
 	segments.clear();
 
 	if(!m || !p || !upper || !bottom) {
@@ -204,11 +204,11 @@ bool mesh_opt::slice_mesh(std::shared_ptr<mesh> m,
 
 				vec3 bary_prod = bary_centric[0] * bary_centric[1];
 				// std::cerr << bary_prod << std::endl;
-				
+
 				vec3 same_side_pp0, same_side_pn0, same_side_pc0;
 				vec3 same_side_pp1, same_side_pn1, same_side_pc1;
 				vec3 other_side_pp, other_side_pn, other_side_pc;
-				
+
 				// a, bc
 				if(!float_equal(bary_prod.x, 0.0f)) {
 					other_side_pp = cur_triangle->a, other_side_pn = m->m_norms[a_ind], other_side_pc = m->m_colors[a_ind];
@@ -232,7 +232,7 @@ bool mesh_opt::slice_mesh(std::shared_ptr<mesh> m,
 
 				if (point_upper_plane(other_side_pp, p)) {
 					upper->add_face(d, e, other_side_pp);
-					
+
 					bottom->add_face(d, same_side_pp0, same_side_pp1);
 					bottom->add_face(same_side_pp1, e, d);
 				}
@@ -255,12 +255,12 @@ bool mesh_opt::slice_mesh(std::shared_ptr<mesh> m,
 				break;
 			}
 		case tp_intersection_type::bottom:
-			{ 
+			{
 				assert(m->m_norms.size() > 0);
 				assert(m->m_colors.size() > 0);
 
 				bottom->add_face(cur_triangle->a, cur_triangle->b, cur_triangle->c);
-				break; 
+				break;
 			}
 		default:
 			break;
@@ -296,13 +296,16 @@ bool mesh_opt::slice_mesh(std::shared_ptr<mesh> m,
 			E(i, 0) = i;
 			E(i, 1) = (i + 1)%((int)segments.size());
 		}
-		igl::triangle::triangulate(V, E, H, "q", V2, F2);
+
+        igl::triangle::triangulate(V, E, H, "q", V2, F2);
+        // igl::triangle::triangulate(V,E,H,"a0.005q",V2,F2);
+
 		int row = F2.rows();
 		for(int ri = 0; ri < row; ++ri) {
 			vec3 a = vec3(V2(F2(ri, 0), 0), segments[0]->t.y, V2(F2(ri, 0), 1));
 			vec3 b = vec3(V2(F2(ri, 1), 0), segments[0]->t.y, V2(F2(ri, 1), 1));
 			vec3 c = vec3(V2(F2(ri, 2), 0), segments[0]->t.y, V2(F2(ri, 2), 1));
-			
+
 			if(glm::dot(glm::cross(b-a, c-b), vec3(0.0f,1.0f,0.0f)) >= 0.0f) {
 				bottom->add_face(a, b, c);
 				upper->add_face(c, b, a);
@@ -316,7 +319,9 @@ bool mesh_opt::slice_mesh(std::shared_ptr<mesh> m,
 	return is_intersect;
 }
 
-bool mesh_opt::slice_mesh(std::shared_ptr<mesh> m, std::shared_ptr<plane> p, std::vector<std::shared_ptr<line_segment>>& segments) {
+bool mesh_opt::slice_mesh(std::shared_ptr<mesh> m,
+                          std::shared_ptr<plane> p,
+                          std::vector<std::shared_ptr<line_segment>>& segments) {
 	bool is_intersect = false;
 	segments.clear();
 
@@ -347,14 +352,46 @@ bool mesh_opt::slice_mesh(std::shared_ptr<mesh> m, std::shared_ptr<plane> p, std
 	return is_intersect;
 }
 
-void mesh_opt::merge_mesh(std::vector<std::shared_ptr<mesh>> meshes, std::shared_ptr<mesh> out) {
-	if(!out) {
-		WARN("input of merge mesh");
-		assert(false);
-	}
+void mesh_opt::eigen_to_mesh(Eigen::MatrixXd &V, Eigen::MatrixXi &F, std::shared_ptr<mesh> m) {
+    if (m == nullptr) {
+        ERROR("Input null");
+        return;
+    }
+    size_t fn = F.rows();
 
-	//#todo_merge_mesh
-	//for(auto &m:meshes) {
-	//	out->merge_mesh(m);
-	//}
+    m->clear_vertices();
+    for (int ti = 0; ti < fn; ++ti) {
+        vec3 p0(V(F(ti, 0), 0), V(F(ti, 0), 1), V(F(ti, 0), 2));
+        vec3 p1(V(F(ti, 1), 0), V(F(ti, 1), 1), V(F(ti, 1), 2));
+        vec3 p2(V(F(ti, 2), 0), V(F(ti, 2), 1), V(F(ti, 2), 2));
+
+        m->add_face(p0, p1, p2);
+    }
 }
+
+
+/*
+ * Note, we assume the vertices are in the world space
+ */
+void mesh_opt::mesh_to_eigen(std::shared_ptr<mesh> m, Eigen::MatrixXd &V, Eigen::MatrixXi &F) {
+    if (m == nullptr) {
+        ERROR("Input null");
+        return;
+    }
+
+    std::vector<glm::vec3> world_verts = m->compute_world_space_coords();
+    size_t vert_n = world_verts.size();
+    size_t face_n = vert_n / 3;
+
+    V = Eigen::MatrixXd(vert_n, 3);
+    F = Eigen::MatrixXi(face_n, 3);
+
+    for (int ti = 0; ti < face_n; ++ti) {
+        V.row(3 * ti + 0) << world_verts[3 * ti + 0].x, world_verts[3 * ti + 0].y, world_verts[3 * ti + 0].z;
+        V.row(3 * ti + 1) << world_verts[3 * ti + 1].x, world_verts[3 * ti + 1].y, world_verts[3 * ti + 1].z;
+        V.row(3 * ti + 2) << world_verts[3 * ti + 2].x, world_verts[3 * ti + 2].y, world_verts[3 * ti + 2].z;
+
+        F.row(ti) << 3 * ti + 0, 3 * ti + 1, 3 * ti + 2;
+    }
+}
+
