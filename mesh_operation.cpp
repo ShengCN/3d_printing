@@ -298,7 +298,7 @@ bool mesh_opt::slice_mesh(std::shared_ptr<mesh> m,
 		}
 
         igl::triangle::triangulate(V, E, H, "q", V2, F2);
-        // igl::triangle::triangulate(V,E,H,"a0.005q",V2,F2);
+        // igl::triangle::triangulate(V,E,H,"a0.01q",V2,F2);
 
 		int row = F2.rows();
 		for(int ri = 0; ri < row; ++ri) {
