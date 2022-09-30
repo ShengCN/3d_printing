@@ -2,11 +2,12 @@
 #include <queue>
 #include <set>
 
-#include <igl/triangle/triangulate.h>
-
 #include "mesh_operation.h"
 #include "graphics_lib/Utilities/Utils.h"
 #include "graphics_lib/Utilities/Logger.h"
+
+#include <igl/triangle/triangulate.h>
+#include <igl/copyleft/cgal/mesh_boolean.h>
 
 using glm::dot;
 using namespace mesh_opt;
@@ -393,5 +394,33 @@ void mesh_opt::mesh_to_eigen(std::shared_ptr<mesh> m, Eigen::MatrixXd &V, Eigen:
 
         F.row(ti) << 3 * ti + 0, 3 * ti + 1, 3 * ti + 2;
     }
+}
+
+bool mesh_opt::mesh_minus(std::shared_ptr<mesh> A, std::shared_ptr<mesh> B) {
+    if (A == nullptr || B == nullptr) {
+        ERROR("A or B is nullptr");
+        return false;
+    }
+
+    using namespace Eigen;
+    using namespace igl;
+    bool ret = false;
+
+    MatrixXd inside_V; MatrixXi inside_F;
+    MatrixXd out_V; MatrixXi out_F;
+
+    /* Try mesh operation */
+    MatrixXd V_A, V_B;
+    MatrixXi F_A, F_B;
+
+    A->remove_duplicate_vertices();
+    A->recompute_normal();
+
+    mesh_to_eigen(A, V_A, F_A);
+    mesh_to_eigen(B, V_B, F_B);
+
+    ret = igl::copyleft::cgal::mesh_boolean(V_A, F_A, V_B, F_B, MESH_BOOLEAN_TYPE_MINUS, out_V, out_F);
+    eigen_to_mesh(out_V, out_F, A);
+    return ret;
 }
 

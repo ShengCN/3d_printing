@@ -38,6 +38,11 @@ namespace mesh_opt {
 	bool slice_mesh(std::shared_ptr<mesh> m, std::shared_ptr<plane> p,
 					std::vector<std::shared_ptr<line_segment>>& segments);
 
+    /*
+     * Boolean operation:  A - B
+     */
+    bool mesh_minus(std::shared_ptr<mesh> A, std::shared_ptr<mesh> B);
+
     void mesh_to_eigen(std::shared_ptr<mesh> m,
                        Eigen::MatrixXd &V,
                        Eigen::MatrixXi &F);
@@ -45,4 +50,5 @@ namespace mesh_opt {
     void eigen_to_mesh(Eigen::MatrixXd &V,
                        Eigen::MatrixXi &F,
                        std::shared_ptr<mesh> m);
+
 };
